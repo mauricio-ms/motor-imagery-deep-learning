@@ -44,7 +44,7 @@ def get_event(event, run_execution):
             return 4
 
 
-PROJECT_NAME = "motor-imagery-deep-learning-decoder"
+PROJECT_NAME = "motor-imagery-convolutional-recurrent-neural-network"
 ROOT_DIR = os.getcwd()[:os.getcwd().index(PROJECT_NAME) + len(PROJECT_NAME)]
 PHYSIONET_DIR = os.path.join(ROOT_DIR, "data/physionet")
 CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "csv-files")
@@ -55,12 +55,12 @@ if os.path.exists(CSV_FILES_DIR):
 os.makedirs(CSV_FILES_DIR)
 
 subjects = sorted(os.listdir(os.path.join(PHYSIONET_DIR, "edf-files")))
-# subjects = ["S100"]
+# subjects = ["S098"]
 for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
     print("Subject: " + subject)
     edf_subject_directory = os.path.join(PHYSIONET_DIR, "edf-files", subject)
     edf_files_names = sorted(os.listdir(edf_subject_directory))
-    # edf_files_names = ["S100R11.edf"]
+    # edf_files_names = ["S098R11.edf"]
     for edf_file_name in filter(lambda f: f.endswith(".edf"), edf_files_names):
         print("File: " + edf_file_name)
         groups_edf_file = re.match("S(\\d+)R(\\d+).edf", edf_file_name).groups()
@@ -71,6 +71,8 @@ for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
         n_channels = edf_file.signals_in_file
         n_samples = edf_file.getNSamples()[0]
         data = np.zeros((n_samples, n_channels+1))
+        # Set invalid label to verify skipped samples
+        data[:, -1] = -1
 
         frequency = edf_file.getSampleFrequencies()[0]
 

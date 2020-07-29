@@ -8,11 +8,11 @@ Dalin Zhang, Lina Yao, Xiang Zhang, Sen Wang, Weitong Chen, Robert Boots, Bouale
 - Make sure you have Conda installed
 - Creating a isolated environment:
 
-    $ conda create --name motor-imagery-crnn python=3.7
+    $ conda create --name motor-imagery-convolutional-recurrent-neural-network python=3.7
     
 - Activating the environment:
 
-    $ conda activate motor-imagery-crnn
+    $ conda activate motor-imagery-convolutional-recurrent-neural-network
     
 - Installing the dependencies:
 
