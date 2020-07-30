@@ -11,3 +11,4 @@ tensorboard==2.3.0
 
 # Data manipulation packages
 pyedflib==0.1.18
+mne==0.20.7
