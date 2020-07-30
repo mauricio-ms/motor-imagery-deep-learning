@@ -2,4 +2,7 @@
 .idea/
 
 # Data
-data/
+data/physionet/csv-files
+data/physionet/edf-files
+data/bci-iv-iia/csv-files
+data/bci-iv-iia/gdf-files
