@@ -19,6 +19,16 @@ Dalin Zhang, Lina Yao, Xiang Zhang, Sen Wang, Weitong Chen, Robert Boots, Bouale
     $ pip install -U -r requirements.txt
 
 ## Modules
+`/data`
+```
+/dataset
+    description.pdf: Contains a description of the dataset
+    labels.json: Contains a json structure to documents the mapping between the class values and a representative description
+    original-events-mapping.m: Contains a description to documents the mapping between the original event values and the respective classes
+```
+
 `/preprocessing`
-* Conversion of eeg original data files to csv files;
-* Normalization of eeg data. 
+```
+- Conversion of eeg original data files to csv files;
+- Normalization of eeg data.
+``` 
