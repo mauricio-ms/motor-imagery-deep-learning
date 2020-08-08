@@ -2,12 +2,13 @@
 .idea/
 
 # Data
-data/physionet/csv-files/
-data/physionet/edf-files/
-data/bci-iv-iia/csv-files/
+data/physionet/raw-edf-files/
+data/physionet/raw-csv-files/
+data/physionet/preprocessed-csv-files/
 data/bci-iv-iia/gdf-files/
-data/bci-iv-iib/csv-files/
+data/bci-iv-iia/csv-files/
 data/bci-iv-iib/gdf-files/
+data/bci-iv-iib/csv-files/
 
 # Cache
 __pycache__/
