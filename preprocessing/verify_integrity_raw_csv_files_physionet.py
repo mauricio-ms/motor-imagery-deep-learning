@@ -10,9 +10,9 @@ RAW_CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-csv-files")
 @tf.function
 def _preprocess(eeg_record):
     defs = [tf.constant([], dtype=tf.float32)] * (N_CHANNELS + 1)
-    tf.io.decode_csv(eeg_record, record_defaults=defs)
-    x = []
-    y = []
+    fields = tf.io.decode_csv(eeg_record, record_defaults=defs)
+    x = tf.stack(fields[:-1])
+    y = tf.cast(tf.stack(fields[-1:]), tf.int32)
     return x, y
 
 
@@ -28,10 +28,10 @@ for subject in subjects:
         dataset = dataset.batch(250).prefetch(tf.data.experimental.AUTOTUNE)
         try:
             for _ in dataset:
-                print(f"Verifying integrity of file {file_name} ...", end="\r")
+                print(f"{len(corrupted_files)} corrupted files until now. Verifying file {file_name} ...",
+                      end="\r")
         except:
             corrupted_files.append(file_name)
 
-# S089R01.csv
 print("Corrupted files:")
 print(corrupted_files)

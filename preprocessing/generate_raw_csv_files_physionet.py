@@ -29,24 +29,24 @@ def get_event(event, run_execution):
             return 4
 
 
-FREQUENCY = 160
 PHYSIONET_DIR = os.path.join(ROOT_DIR, "data/physionet")
+RAW_EDF_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-edf-files")
 RAW_CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-csv-files")
 
 if os.path.exists(RAW_CSV_FILES_DIR):
     shutil.rmtree(RAW_CSV_FILES_DIR)
 os.makedirs(RAW_CSV_FILES_DIR)
 
-subjects = sorted(os.listdir(os.path.join(PHYSIONET_DIR, "edf-files")))
-#subjects = ["S088"]
+# Ignore subjects with damaged data
+ignored_subjects = ["S089"]
+subjects = filter(lambda s: s not in ignored_subjects, sorted(os.listdir(RAW_EDF_FILES_DIR)))
 for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
     csv_subject_directory = os.path.join(RAW_CSV_FILES_DIR, subject)
     if not os.path.exists(csv_subject_directory):
         os.makedirs(csv_subject_directory)
 
-    edf_subject_directory = os.path.join(PHYSIONET_DIR, "edf-files", subject)
+    edf_subject_directory = os.path.join(RAW_EDF_FILES_DIR, subject)
     edf_files_names = sorted(os.listdir(edf_subject_directory))
-    #edf_files_names = ["S088R03.edf"]
     for edf_file_name in filter(lambda f: f.endswith(".edf"), edf_files_names):
         print(f"Converting EDF file {edf_file_name} to CSV ...", end="\r")
         groups_edf_file = re.match("S(\\d+)R(\\d+).edf", edf_file_name).groups()
