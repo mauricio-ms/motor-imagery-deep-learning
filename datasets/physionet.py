@@ -1,23 +1,39 @@
 import os
 from main import ROOT_DIR
+from logger.log_factory import get_logger
 import tensorflow as tf
 import numpy as np
 
+LOGGER = get_logger("physionet.py")
 N_CHANNELS = 64
 PHYSIONET_DIR = os.path.join(ROOT_DIR, "data/physionet")
 PREPROCESSED_CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "preprocessed-csv-files")
 
 
-def load_data(**kwargs):
+def load_data(train_size=0.75, validation_size=None, n_subjects=None, **kwargs):
+    LOGGER.info("Loading Physionet dataset ...")
     subjects = np.array(sorted(os.listdir(PREPROCESSED_CSV_FILES_DIR)))
-    train_subjects_mask = np.random.rand(len(subjects)) < 0.75
-    train_subjects = subjects[train_subjects_mask]
-    validation_subjects = subjects[~train_subjects_mask]
+    if n_subjects is not None:
+        subjects = subjects[:n_subjects]
+    train_subjects, test_subjects = _train_test_split_subjects(subjects, train_size)
+    if validation_size is not None:
+        train_subjects, validation_subjects = _train_test_split_subjects(train_subjects, 1-validation_size)
+        LOGGER.info(f"(Train, Validation, Test) Subjects = "
+                    f"({len(train_subjects)}, {len(validation_subjects)}, {len(test_subjects)})")
+        return _load_set(train_subjects, **kwargs), \
+            _load_set(validation_subjects, **kwargs), \
+            _load_set(test_subjects, **kwargs)
 
-    return _load_set(train_subjects, **kwargs), _load_set(validation_subjects, **kwargs)
+    LOGGER.info(f"(Train, Validation) Subjects = ({len(train_subjects)}, {len(test_subjects)})")
+    return _load_set(train_subjects, **kwargs), _load_set(test_subjects, **kwargs)
 
 
-def _load_set(subjects, n_readers=5, n_parse_threads=5, batch_size=10,
+def _train_test_split_subjects(subjects, train_size):
+    train_subjects_mask = np.random.rand(len(subjects)) < train_size
+    return subjects[train_subjects_mask], subjects[~train_subjects_mask]
+
+
+def _load_set(subjects, n_readers=5, n_parse_threads=5, batch_size=100,
               convert_to_2d=False, expand_dim=False):
     path_files = [os.path.join(PREPROCESSED_CSV_FILES_DIR, subject, file_name)
                   for subject in subjects

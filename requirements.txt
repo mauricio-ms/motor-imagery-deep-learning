@@ -1,3 +1,6 @@
+# Core packages
+colorlog==4.2.1
+
 # Core scientific packages
 jupyter==1.0.0
 matplotlib==3.3.0

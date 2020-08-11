@@ -1,5 +1,5 @@
-# IDEA
-.idea/
+# Cache
+__pycache__/
 
 # Data
 data/physionet/raw-edf-files/
@@ -10,5 +10,8 @@ data/bci-iv-iia/csv-files/
 data/bci-iv-iib/gdf-files/
 data/bci-iv-iib/csv-files/
 
-# Cache
-__pycache__/
+# IDEA
+.idea/
+
+# Log
+app.log
