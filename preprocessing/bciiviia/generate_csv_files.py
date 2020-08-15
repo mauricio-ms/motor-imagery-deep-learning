@@ -1,5 +1,5 @@
 import os
-import shutil
+from helpers.file_system_helper import recreate_dir
 import numpy as np
 import pandas as pd
 import mne
@@ -34,9 +34,7 @@ ROOT_DIR = os.getcwd()[:os.getcwd().index(PROJECT_NAME) + len(PROJECT_NAME)]
 BCI_IV_IIA_DIR = os.path.join(ROOT_DIR, "data/bci-iv-iia")
 CSV_FILES_DIR = os.path.join(BCI_IV_IIA_DIR, "csv-files")
 
-if os.path.exists(CSV_FILES_DIR):
-    shutil.rmtree(CSV_FILES_DIR)
-os.makedirs(CSV_FILES_DIR)
+recreate_dir(CSV_FILES_DIR)
 
 gdf_file_name = "A02T.gdf"
 gdf_file = mne.io.read_raw_gdf(os.path.join(BCI_IV_IIA_DIR, "gdf-files", gdf_file_name), preload=True)

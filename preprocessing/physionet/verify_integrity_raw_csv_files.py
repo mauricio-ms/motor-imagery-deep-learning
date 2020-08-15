@@ -1,9 +1,8 @@
 import os
-from main import ROOT_DIR
+from preprocessing.physionet.config import PHYSIONET_DIR
 import tensorflow as tf
 
 N_CHANNELS = 64
-PHYSIONET_DIR = os.path.join(ROOT_DIR, "data/physionet")
 RAW_CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-csv-files")
 
 
@@ -19,10 +18,10 @@ def _preprocess(eeg_record):
 corrupted_files = []
 subjects = sorted(os.listdir(RAW_CSV_FILES_DIR))
 for subject in subjects:
-    subject_directory = os.path.join(RAW_CSV_FILES_DIR, subject)
-    files_names = sorted(os.listdir(subject_directory))
+    subject_path_dir = os.path.join(RAW_CSV_FILES_DIR, subject)
+    files_names = sorted(os.listdir(subject_path_dir))
     for file_name in files_names:
-        file_path = os.path.join(subject_directory, file_name)
+        file_path = os.path.join(subject_path_dir, file_name)
         dataset = tf.data.TextLineDataset(file_path).skip(1)
         dataset = dataset.map(_preprocess, num_parallel_calls=5)
         dataset = dataset.batch(250).prefetch(tf.data.experimental.AUTOTUNE)
