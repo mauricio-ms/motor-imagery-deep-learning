@@ -1,3 +1,5 @@
+from main import ROOT_DIR
+import os
 import logging
 import colorlog
 
@@ -25,7 +27,7 @@ def get_logger(name="__main__", debug=False):
         logger.setLevel(logging.INFO)
 
     # Output full log
-    fh = logging.FileHandler("app.log")
+    fh = logging.FileHandler(os.path.join(ROOT_DIR, "app.log"))
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter(log_format)
     fh.setFormatter(formatter)
