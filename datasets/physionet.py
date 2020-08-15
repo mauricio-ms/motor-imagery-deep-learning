@@ -7,12 +7,12 @@ import numpy as np
 LOGGER = get_logger("physionet.py")
 N_CHANNELS = 64
 PHYSIONET_DIR = os.path.join(ROOT_DIR, "data/physionet")
-PREPROCESSED_CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "preprocessed-csv-files")
+CSV_FILES_DIR = os.path.join(PHYSIONET_DIR, "preprocessed-csv-files")
 
 
 def load_data(train_size=0.75, validation_size=None, n_subjects=None, **kwargs):
     LOGGER.info("Loading Physionet dataset ...")
-    subjects = np.array(sorted(os.listdir(PREPROCESSED_CSV_FILES_DIR)))
+    subjects = np.array(sorted(os.listdir(CSV_FILES_DIR)))
     if n_subjects is not None:
         subjects = subjects[:n_subjects]
     train_subjects, test_subjects = _train_test_split_subjects(subjects, train_size)
@@ -35,9 +35,9 @@ def _train_test_split_subjects(subjects, train_size):
 
 def _load_set(subjects, n_readers=5, n_parse_threads=5, batch_size=100,
               convert_to_2d=False, expand_dim=False):
-    path_files = [os.path.join(PREPROCESSED_CSV_FILES_DIR, subject, file_name)
+    path_files = [os.path.join(CSV_FILES_DIR, subject, file_name)
                   for subject in subjects
-                  for file_name in sorted(os.listdir(os.path.join(PREPROCESSED_CSV_FILES_DIR, subject)))]
+                  for file_name in sorted(os.listdir(os.path.join(CSV_FILES_DIR, subject)))]
     dataset = tf.data.Dataset.list_files(path_files)
     dataset = dataset.interleave(
         lambda filepath: tf.data.TextLineDataset(filepath).skip(1),

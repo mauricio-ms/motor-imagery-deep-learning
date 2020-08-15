@@ -1,12 +1,8 @@
 from datasets import physionet
 from tensorflow import keras
 
-train_set, validation_set = physionet.load_data(expand_dim=True)
+train_set, validation_set, test_set = physionet.load_data(expand_dim=True, validation_size=0.20)
 
-# batch_size = 100 no artigo
-# splitar em treino novamente para obter o set de validação
-# rodar com um número menor de dados
-# ver ferramenta online para rodar os modelos
 model = keras.models.Sequential([
     keras.layers.Conv1D(32, 3, activation="relu",
                         kernel_initializer="he_normal",
