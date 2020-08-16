@@ -18,6 +18,7 @@ def load_data(train_size=0.75, validation_size=None, n_subjects=None, **kwargs):
     LOGGER.info("Loading Physionet dataset ...")
     subjects = np.array(sorted(os.listdir(TFRECORD_FILES_DIR)))
     if n_subjects is not None:
+        np.random.shuffle(subjects)
         subjects = subjects[:n_subjects]
     train_subjects, test_subjects = _train_test_split_subjects(subjects, train_size)
     if validation_size is not None:
