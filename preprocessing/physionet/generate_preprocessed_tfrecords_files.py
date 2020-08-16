@@ -3,7 +3,7 @@ import re
 import numpy as np
 import helpers.file_system_helper as fsh
 import tensorflow as tf
-from tensorflow.core.example.feature_pb2 import Features, Feature, FloatList
+from tensorflow.core.example.feature_pb2 import Features, Feature, FloatList, Int64List
 from tensorflow.core.example.example_pb2 import Example
 from preprocessing.physionet.config import PHYSIONET_DIR, DAMAGED_SUBJECTS
 from preprocessing.physionet.EdfFile import EdfFile
@@ -30,12 +30,12 @@ for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
             for n_sample in range(edf_file.n_samples):
                 eeg_record = edf_file.data[n_sample, :-1]
                 eeg_record_normalized = (eeg_record - np.mean(eeg_record, axis=0)) / np.std(eeg_record, axis=0)
-                labels = edf_file.data[n_sample, -1]
+                labels = edf_file.data[n_sample, -1].astype(int)
                 eeg_example = Example(
                     features=Features(
                         feature={
                             "X": Feature(float_list=FloatList(value=eeg_record)),
-                            "y": Feature(float_list=FloatList(value=[labels]))
+                            "y": Feature(int64_list=Int64List(value=[labels]))
                         }
                     )
                 )
