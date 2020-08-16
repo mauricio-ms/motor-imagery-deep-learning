@@ -2,12 +2,13 @@
 __pycache__/
 
 # Data
-data/physionet/
+data/physionet/*
 !data/physionet/README.md
-data/bci-iv-iia/
+!data/physionet/montage.png
+data/bci-iv-iia/*
 !data/bci-iv-iia/description.pdf
 !data/bci-iv-iia/README.md
-data/bci-iv-iib/
+data/bci-iv-iib/*
 !data/bci-iv-iib/description.pdf
 
 # IDEA
