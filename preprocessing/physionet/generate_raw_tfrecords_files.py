@@ -1,7 +1,7 @@
 import os
 import re
 import helpers.file_system_helper as fsh
-from preprocessing.physionet.config import PHYSIONET_DIR, DAMAGED_SUBJECTS
+from preprocessing.physionet.config import PHYSIONET_DIR, DAMAGED_SUBJECTS, EXECUTIONS_OF_INTEREST
 from preprocessing.physionet.EdfFile import EdfFile
 import tensorflow as tf
 from tensorflow.core.example.feature_pb2 import Features, Feature, FloatList, Int64List
@@ -9,6 +9,7 @@ from tensorflow.core.example.example_pb2 import Example
 
 RAW_EDF_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-edf-files")
 RAW_TFRECORD_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-tfrecord-files")
+EXECUTIONS_OF_INTEREST_REGEX = f"({'|'.join(EXECUTIONS_OF_INTEREST)})"
 
 fsh.recreate_dir(RAW_TFRECORD_FILES_DIR)
 
@@ -19,7 +20,8 @@ for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
 
     edf_subject_path_dir = os.path.join(RAW_EDF_FILES_DIR, subject)
     edf_file_names = sorted(os.listdir(edf_subject_path_dir))
-    for edf_file_name in filter(lambda f: f.endswith(".edf"), edf_file_names):
+    for edf_file_name in filter(lambda f: re.match(f"^{subject}{EXECUTIONS_OF_INTEREST_REGEX}\\.edf$", f),
+                                edf_file_names):
         print(f"Generating TFRecord file from the file {edf_file_name} ...", end="\r")
         edf_file = EdfFile(edf_subject_path_dir, edf_file_name)
 
