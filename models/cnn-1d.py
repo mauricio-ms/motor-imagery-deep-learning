@@ -1,7 +1,7 @@
 from datasets import physionet
 from tensorflow import keras
 
-train_set, validation_set, test_set = physionet.load_data(expand_dim=True, validation_size=0.20)
+train_set, test_set = physionet.load_data(expand_dim=True)
 
 model = keras.models.Sequential([
     keras.layers.Conv1D(32, 3, activation="relu",
@@ -26,4 +26,6 @@ optimizer = keras.optimizers.Adam(lr=1e-4)
 model.compile(loss="sparse_categorical_crossentropy",
               optimizer=optimizer,
               metrics=["accuracy"])
-model.fit(train_set, epochs=10, validation_data=validation_set)
+history = model.fit(train_set, epochs=10)
+
+model.evaluate(test_set)
