@@ -48,7 +48,7 @@ The EEGs were recorded from 64 electrodes as per the international 10-10 system 
 
 ![montage](montage.png)
 
-## PreProcessing
+## Pre-Processing
 Initially, the runs corresponding to eyes closed and motor imagery tasks will be selected:
 
 - Eyes closed
@@ -60,14 +60,16 @@ Initially, the runs corresponding to eyes closed and motor imagery tasks will be
     
 Each EEG record in the edf-files corresponding to the runs above will be mapped to one of the following events in the target files:
 
-    "0": "REST"
-    "1": "LEFT_FIST"
-    "2": "RIGHT_FIST"
-    "3": "BOTH_FISTS"
-    "4": "BOTH_FEET"
+    0: "eyes-closed"
+    1: "left-fist"
+    2: "right-fist"
+    3: "both-fists"
+    4: "both-feet"
     
-    _\* Where REST corresponds to the eyes closed runs_
+The rest samples of motor imagery runs will be removed.
 
-The normalization will be performed with the Z-score for each run file.
+The normalization will be performed with the Z-score for each sample.
 
 The segmentation will be performed in intervals of 10 samples.
+
+The 2D mapping will be made according with the montage above. 

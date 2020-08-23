@@ -6,59 +6,41 @@ Dalin Zhang, Lina Yao, Xiang Zhang, Sen Wang, Weitong Chen, Robert Boots, Bouale
 
 ## Getting started
 - Make sure you have Conda installed
-- Creating a isolated environment:
-
+- Create a isolated environment:
+    ```
     $ conda create --name motor-imagery-convolutional-recurrent-neural-network python=3.7
+    ```
     
-- Activating the environment:
-
+- Activate the environment:
+    ```
     $ conda activate motor-imagery-convolutional-recurrent-neural-network
-    
-- Installing the dependencies:
-
-    $ pip install -U -r requirements.txt
+    ``` 
+- Install the dependencies:
+    ```
+    pip install -U -r requirements.txt
+    ```
 
 ## Modules
-`/data`
 ```
-/dataset
-    description.pdf: Contains a description of the dataset
-    labels.json: Contains a json structure to documents the mapping between the class values and a representative description
-    original-events-mapping.m: Contains a description to documents the mapping between the original event values and the respective classes
-```
-
-`/preprocessing`
-```
-- Conversion of eeg original data files to csv files;
-- Normalization of eeg data.
+/data/dataset/{dataset-name}
+    description.pdf: Optional pdf with a description of the dataset
+    montage.png: Optional image of the montage used to the acquisition of the EEG data
+    README.md: README about the dataset and the pre-processing steps
 ```
 
-## Models
-Model: "cnn_1d"
-_________________________________________________________________
-Layer (type)                 Output Shape              Param #   
-=================================================================
-conv1d (Conv1D)              (None, 64, 32)            128       
-_________________________________________________________________
-conv1d_1 (Conv1D)            (None, 64, 64)            6208      
-_________________________________________________________________
-conv1d_2 (Conv1D)            (None, 64, 128)           24704     
-_________________________________________________________________
-flatten (Flatten)            (None, 8192)              0         
-_________________________________________________________________
-dropout (Dropout)            (None, 8192)              0         
-_________________________________________________________________
-dense (Dense)                (None, 1024)              8389632   
-_________________________________________________________________
-dropout_1 (Dropout)          (None, 1024)              0         
-_________________________________________________________________
-dense_1 (Dense)              (None, 5)                 5125      
-=================================================================
-Total params: 8,425,797
-Trainable params: 8,425,797
-Non-trainable params: 0
-_________________________________________________________________
+```
+/datasets
+    {dataset-name}.py: Script to load dataset
+```
 
-# TO DO
-- Update folders documentation in readme
-- Add validation in `verify_integrity_raw_csv_files_physionet` to verify if files has samples skipped by the label `-1`
+```
+/models/{dataset-name}
+    Package of scripts with models to resolve the dataset problem.
+
+    README.md: README with description about each model in this package
+```
+
+```
+/preprocessing/{dataset-name}
+    Package of scripts to perform the pre-processing steps referring to dataset
+```

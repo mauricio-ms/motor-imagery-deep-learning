@@ -14,5 +14,8 @@ data/bci-iv-iib/*
 # IDEA
 .idea/
 
+# Local scripts
+run-tensorboard.sh
+
 # Log
 app.log
