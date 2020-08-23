@@ -3,6 +3,9 @@ import pyedflib
 import os
 import numpy as np
 
+MOVEMENT_SINGLE_MEMBER_RUNS = [3, 4, 7, 8, 11, 12]
+MOVEMENT_BOTH_MEMBERS_RUNS = [5, 6, 9, 10, 13, 14]
+
 
 class EdfFile:
     def __init__(self, edf_path_dir, edf_file_name):
@@ -23,15 +26,15 @@ class EdfFile:
         self.frequency = self.__file.getSampleFrequencies()[0]
         self.n_samples = int(np.round(np.sum(self.__duration_events), decimals=2) * self.frequency)
         self.n_channels = self.__file.signals_in_file
-        self.data = self.__read()
+        self.data, self.labels = self.__read()
 
     def get_path_file(self, path_dir, extension):
         return os.path.join(path_dir, f"S{self.subject}R{self.run_execution}.{extension}")
 
     def __read(self):
-        data = np.zeros((self.n_samples, self.n_channels + 1))
+        data = np.zeros((self.n_samples, self.n_channels))
         # Set invalid label to verify skipped samples
-        data[:, -1] = -1
+        labels = np.full(self.n_samples, "invalid", dtype="U256")
         end_index = None
         for index_event in range(len(self.__onset_events)):
             onset_event = self.__onset_events[index_event]
@@ -47,25 +50,35 @@ class EdfFile:
 
             for ch in np.arange(self.n_channels):
                 data[onset_index:end_index, ch] = self.__file.readSignal(ch, onset_event, event_samples)
-            data[onset_index:end_index, -1] = np.repeat(self.__get_label_for_event(event), event_samples)
+            labels[onset_index:end_index] = np.repeat(self.__get_label_for_event(event), event_samples)
 
-        return data
+        if np.sum(labels == "invalid") > 0:
+            print("WARNING: Samples skipped when reading the file " + self.edf_file_name)
 
+        return data, labels
+
+    """
+        The events of real movements are not handled because these files are not read
+    """
     def __get_label_for_event(self, event):
         if event == "T0":
-            return 0
-
-        movement_single_member_runs = [3, 4, 7, 8, 11, 12]
-        movement_both_members_runs = [5, 6, 9, 10, 13, 14]
+            if self.run_execution == 1:
+                return "eyes-open"
+            elif self.run_execution == 2:
+                return "eyes-closed"
+            else:
+                return "rest"
 
         if event == "T1":
-            if self.run_execution in movement_single_member_runs:
-                return 1
-            elif self.run_execution in movement_both_members_runs:
-                return 3
+            if self.run_execution in MOVEMENT_SINGLE_MEMBER_RUNS:
+                return "left-fist"
+            elif self.run_execution in MOVEMENT_BOTH_MEMBERS_RUNS:
+                return "both-fists"
 
         if event == "T2":
-            if self.run_execution in movement_single_member_runs:
-                return 2
-            elif self.run_execution in movement_both_members_runs:
-                return 4
+            if self.run_execution in MOVEMENT_SINGLE_MEMBER_RUNS:
+                return "right-fist"
+            elif self.run_execution in MOVEMENT_BOTH_MEMBERS_RUNS:
+                return "both-feet"
+
+        return None
