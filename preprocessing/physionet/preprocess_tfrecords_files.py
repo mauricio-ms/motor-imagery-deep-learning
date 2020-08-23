@@ -9,7 +9,7 @@ from preprocessing.physionet.config import PHYSIONET_DIR, DAMAGED_SUBJECTS, EXEC
 from preprocessing.physionet.EdfFile import EdfFile
 
 RAW_EDF_FILES_DIR = os.path.join(PHYSIONET_DIR, "raw-edf-files")
-RAW_TFRECORD_FILES_DIR = os.path.join(PHYSIONET_DIR, "preprocessed-tfrecord-files")
+RAW_TFRECORD_FILES_DIR = os.path.join(PHYSIONET_DIR, "preprocessed-tfrecord-files-2")
 EXECUTIONS_OF_INTEREST_REGEX = f"({'|'.join(EXECUTIONS_OF_INTEREST)})"
 
 fsh.recreate_dir(RAW_TFRECORD_FILES_DIR)
@@ -31,12 +31,12 @@ for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
         with tf.io.TFRecordWriter(tfrecord_path_file, options) as tfr:
             for n_sample in range(edf_file.n_samples):
                 eeg_record = edf_file.data[n_sample, :-1]
-                eeg_record_normalized = (eeg_record - np.mean(eeg_record, axis=0)) / np.std(eeg_record, axis=0)
+                eeg_record_normalized = (eeg_record - np.mean(eeg_record)) / np.std(eeg_record)
                 labels = edf_file.data[n_sample, -1].astype(int)
                 eeg_example = Example(
                     features=Features(
                         feature={
-                            "X": Feature(float_list=FloatList(value=eeg_record)),
+                            "X": Feature(float_list=FloatList(value=eeg_record_normalized)),
                             "y": Feature(int64_list=Int64List(value=[labels]))
                         }
                     )

@@ -9,13 +9,17 @@ PHYSIONET_DIR = os.path.join(ROOT_DIR, "data/physionet")
 TFRECORD_FILES_DIR = os.path.join(PHYSIONET_DIR, "preprocessed-tfrecord-files")
 
 
-def load_data(train_size=0.75, validation_size=None, n_subjects=None, **kwargs):
+def load_data(train_size=0.75, validation_size=None, n_subjects=None,
+              train_subjects=None, test_subjects=None, **kwargs):
     LOGGER.info("Loading Physionet dataset ...")
     subjects = np.array(sorted(os.listdir(TFRECORD_FILES_DIR)))
     if n_subjects is not None:
         np.random.shuffle(subjects)
         subjects = subjects[:n_subjects]
-    train_subjects, test_subjects = _train_test_split_subjects(subjects, train_size)
+
+    if train_subjects is None or test_subjects is None:
+        train_subjects, test_subjects = _train_test_split_subjects(subjects, train_size)
+
     if validation_size is not None:
         train_subjects, validation_subjects = _train_test_split_subjects(train_subjects, 1-validation_size)
         LOGGER.info(f"(Train, Validation, Test) Subjects = "
@@ -52,7 +56,6 @@ def _load_set(subjects, n_readers=tf.data.experimental.AUTOTUNE,
     dataset = dataset.batch(batch_size)
     dataset = dataset.map(lambda r: _preprocess(r, expand_dim=expand_dim),
                           num_parallel_calls=n_parse_threads)
-    dataset = dataset.cache()
     return dataset.prefetch(1)
 
 
