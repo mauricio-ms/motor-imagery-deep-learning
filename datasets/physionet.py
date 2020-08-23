@@ -42,21 +42,20 @@ def _train_test_split_subjects(subjects, train_size):
     return subjects[train_subjects_mask], subjects[~train_subjects_mask]
 
 
-# TODO - convert_to_2d should define the data directory
 def _load_set(subjects, n_readers=tf.data.experimental.AUTOTUNE,
-              n_parse_threads=tf.data.experimental.AUTOTUNE,
-              batch_size=100, convert_to_2d=False, expand_dim=False):
+              n_parallel_calls=tf.data.experimental.AUTOTUNE,
+              batch_size=100, expand_dim=False):
     path_files = [os.path.join(TFRECORD_FILES_DIR, subject, file_name)
                   for subject in subjects
                   for file_name in sorted(os.listdir(os.path.join(TFRECORD_FILES_DIR, subject)))]
     dataset = tf.data.Dataset.list_files(path_files)
     dataset = dataset.interleave(
         lambda filepath: tf.data.TFRecordDataset(filepath, compression_type="GZIP"),
-        cycle_length=n_readers, num_parallel_calls=n_parse_threads)
+        cycle_length=n_readers, num_parallel_calls=n_parallel_calls)
     dataset = dataset.batch(batch_size)
     dataset = dataset.map(lambda r: _preprocess(r, expand_dim=expand_dim),
-                          num_parallel_calls=n_parse_threads)
-    return dataset.prefetch(1)
+                          num_parallel_calls=n_parallel_calls)
+    return dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
 
 @tf.function
