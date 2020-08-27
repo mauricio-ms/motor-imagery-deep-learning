@@ -14,7 +14,7 @@ class EdfFile:
 
         groups_edf_file = re.match("S(\\d+)R(\\d+).edf", edf_file_name).groups()
         self.subject = groups_edf_file[0]
-        self.run_execution = int(groups_edf_file[1])
+        self.run_execution = groups_edf_file[1]
         self.__file = pyedflib.EdfReader(os.path.join(edf_path_dir, edf_file_name))
         self.channels_labels = self.__file.getSignalLabels()
 
@@ -30,6 +30,9 @@ class EdfFile:
 
     def get_path_file(self, path_dir, extension):
         return os.path.join(path_dir, f"S{self.subject}R{self.run_execution}.{extension}")
+
+    def close(self):
+        self.__file.close()
 
     def __read(self):
         data = np.zeros((self.n_samples, self.n_channels))
@@ -50,7 +53,8 @@ class EdfFile:
 
             for ch in np.arange(self.n_channels):
                 data[onset_index:end_index, ch] = self.__file.readSignal(ch, onset_event, event_samples)
-            labels[onset_index:end_index] = np.repeat(self.__get_label_for_event(event), event_samples)
+            labels[onset_index:end_index] = np.repeat(self.__get_label_for_event(
+                event, int(self.run_execution)), event_samples)
 
         if np.sum(labels == "invalid") > 0:
             print("WARNING: Samples skipped when reading the file " + self.edf_file_name)
@@ -60,25 +64,26 @@ class EdfFile:
     """
         The events of real movements are not handled because these files are not read
     """
-    def __get_label_for_event(self, event):
+    @staticmethod
+    def __get_label_for_event(event, run_execution):
         if event == "T0":
-            if self.run_execution == 1:
+            if run_execution == 1:
                 return "eyes-open"
-            elif self.run_execution == 2:
+            elif run_execution == 2:
                 return "eyes-closed"
             else:
                 return "rest"
 
         if event == "T1":
-            if self.run_execution in MOVEMENT_SINGLE_MEMBER_RUNS:
+            if run_execution in MOVEMENT_SINGLE_MEMBER_RUNS:
                 return "left-fist"
-            elif self.run_execution in MOVEMENT_BOTH_MEMBERS_RUNS:
+            elif run_execution in MOVEMENT_BOTH_MEMBERS_RUNS:
                 return "both-fists"
 
         if event == "T2":
-            if self.run_execution in MOVEMENT_SINGLE_MEMBER_RUNS:
+            if run_execution in MOVEMENT_SINGLE_MEMBER_RUNS:
                 return "right-fist"
-            elif self.run_execution in MOVEMENT_BOTH_MEMBERS_RUNS:
+            elif run_execution in MOVEMENT_BOTH_MEMBERS_RUNS:
                 return "both-feet"
 
         return None
