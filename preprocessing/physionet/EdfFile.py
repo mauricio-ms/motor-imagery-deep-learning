@@ -52,7 +52,7 @@ class EdfFile:
             event_samples = end_index - onset_index
 
             for ch in np.arange(self.n_channels):
-                data[onset_index:end_index, ch] = self.__file.readSignal(ch, onset_event, event_samples)
+                data[onset_index:end_index, ch] = self.__file.readSignal(ch, onset_index, event_samples)
             labels[onset_index:end_index] = np.repeat(self.__get_label_for_event(
                 event, int(self.run_execution)), event_samples)
 
