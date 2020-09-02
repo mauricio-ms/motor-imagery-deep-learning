@@ -55,3 +55,5 @@ for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
                     )
                 )
                 tfr.write(eeg_example.SerializeToString())
+
+        edf_file.close()
