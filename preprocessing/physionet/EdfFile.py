@@ -8,7 +8,7 @@ MOVEMENT_BOTH_MEMBERS_RUNS = [5, 6, 9, 10, 13, 14]
 
 
 class EdfFile:
-    def __init__(self, edf_path_dir, edf_file_name):
+    def __init__(self, edf_path_dir, edf_file_name, channels=None):
         self.edf_path_dir = edf_path_dir
         self.edf_file_name = edf_file_name
 
@@ -16,7 +16,6 @@ class EdfFile:
         self.subject = groups_edf_file[0]
         self.run_execution = groups_edf_file[1]
         self.__file = pyedflib.EdfReader(os.path.join(edf_path_dir, edf_file_name))
-        self.channels_labels = self.__file.getSignalLabels()
 
         annotations = self.__file.readAnnotations()
         self.__onset_events = annotations[0]
@@ -25,7 +24,9 @@ class EdfFile:
 
         self.frequency = self.__file.getSampleFrequencies()[0]
         self.n_samples = int(np.round(np.sum(self.__duration_events), decimals=2) * self.frequency)
-        self.n_channels = self.__file.signals_in_file
+        self.n_channels = self.__file.signals_in_file if channels is None else len(channels)
+        self.channels = np.arange(self.n_channels) if channels is None else channels
+        self.channels_labels = np.array(self.__file.getSignalLabels())[self.channels]
         self.data, self.labels = self.__read()
 
     def get_path_file(self, path_dir, extension):
@@ -51,8 +52,8 @@ class EdfFile:
                                    self.n_samples)
             event_samples = end_index - onset_index
 
-            for ch in np.arange(self.n_channels):
-                data[onset_index:end_index, ch] = self.__file.readSignal(ch, onset_index, event_samples)
+            for ch_index, ch in enumerate(self.channels):
+                data[onset_index:end_index, ch_index] = self.__file.readSignal(ch, onset_index, event_samples)
             labels[onset_index:end_index] = np.repeat(self.__get_label_for_event(
                 event, int(self.run_execution)), event_samples)
 
