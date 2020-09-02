@@ -1,4 +1,4 @@
-# motor-imagery-convolutional-recurrent-neural-network
+# motor-imagery-deep-learning
 Implementation of Convolutional Recurrent Neural Network (CRNN) to decode motor imagery EEG data.
 
 The implementation is based on the article: [Cascade and Parallel Convolutional Recurrent Neural Networks on EEG-based Intention Recognition for Brain Computer Interface
@@ -8,12 +8,12 @@ Dalin Zhang, Lina Yao, Xiang Zhang, Sen Wang, Weitong Chen, Robert Boots, Bouale
 - Make sure you have Conda installed
 - Create a isolated environment:
     ```
-    $ conda create --name motor-imagery-convolutional-recurrent-neural-network python=3.7
+    $ conda create --name motor-imagery-deep-learning python=3.7
     ```
     
 - Activate the environment:
     ```
-    $ conda activate motor-imagery-convolutional-recurrent-neural-network
+    $ conda activate motor-imagery-deep-learning
     ``` 
 - Install the dependencies:
     ```

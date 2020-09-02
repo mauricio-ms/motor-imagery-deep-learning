@@ -72,4 +72,4 @@ The normalization will be performed with the Z-score for each sample.
 
 The segmentation will be performed in intervals of 10 samples.
 
-The 2D mapping will be made according with the montage above. 
+The 2D mapping will be made according with the montage above.
