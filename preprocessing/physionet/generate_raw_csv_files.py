@@ -31,3 +31,5 @@ for subject in filter(lambda f: re.match("S(\\d+)", f), subjects):
         csv_path_file = edf_file.get_path_file(csv_subject_path_dir, "csv")
         pd.DataFrame(data)\
             .to_csv(csv_path_file, header=header, index=False)
+
+        edf_file.close()
