@@ -45,6 +45,12 @@ def _train_test_split_subjects(subjects, train_size):
 def _load_set(subjects, n_readers=tf.data.experimental.AUTOTUNE,
               n_parallel_calls=tf.data.experimental.AUTOTUNE,
               batch_size=100, expand_dim=False):
+    """
+        The reason to expand_dim parameter is because TensorFlow expects a certain input shape
+        for it's Deep Learning Model. For example a Convolution Neural Network expect:
+
+        (<number of samples>, <x_dim sample>, <y_dim sample>, <number of channels>)
+    """
     path_files = [os.path.join(TFRECORD_FILES_DIR, subject, file_name)
                   for subject in subjects
                   for file_name in sorted(os.listdir(os.path.join(TFRECORD_FILES_DIR, subject)))]
