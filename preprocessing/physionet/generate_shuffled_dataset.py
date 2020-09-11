@@ -20,7 +20,6 @@ path_files = [os.path.join(INPUT_DATASET_DIR, subject)
 dataset = tf.data.Dataset.list_files(path_files)
 dataset = dataset.interleave(
     lambda filepath: tf.data.TFRecordDataset(filepath, compression_type="GZIP"))
-dataset = dataset.take(10)
 
 samples = np.array(list(dataset.as_numpy_iterator()))
 n_samples = len(samples)
