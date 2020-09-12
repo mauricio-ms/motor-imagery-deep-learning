@@ -20,7 +20,7 @@ def convert_to_2D(X):
 
 
 @tf.function
-def preprocess_3d(serialized_eeg_record, expand_dim=False):
+def preprocess(serialized_eeg_record, X_shape=None, expand_dim=False):
     """
         The reason to expand_dim parameter is because TensorFlow expects a certain input shape
         for it's Deep Learning Model. For example a Convolution Neural Network expect:
@@ -34,7 +34,9 @@ def preprocess_3d(serialized_eeg_record, expand_dim=False):
     parsed_eeg_records = tf.io.parse_single_example(serialized_eeg_record, feature_description)
     X = parsed_eeg_records["X"]
     X = tf.io.parse_tensor(X, out_type=tf.float64)
-    X.set_shape((10, 10, 11))
+
+    if X_shape is not None:
+        X.set_shape(X_shape)
     y = parsed_eeg_records["y"]
 
     if expand_dim:
