@@ -36,4 +36,4 @@ standard_deviations = [0.03954583526706644,
                        0.03525687402023222]
 
 plot(x_tick_labels, averages, standard_deviations, "results-conv1d-kernel-size-selection.png",
-     x_label="Kernel 1º camada, Kernel 2º camada, Kernel 3º camada", figsize=(12, 8))
+     x_label="Kernel 1º camada, Kernel 2º camada, Kernel 3º camada", fig_size=(12, 8))
