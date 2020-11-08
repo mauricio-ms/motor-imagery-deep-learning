@@ -10,62 +10,35 @@ from tensorflow.core.example.example_pb2 import Example
 from tensorflow.core.example.feature_pb2 import Features, Feature, BytesList, Int64List
 
 import helpers.file_system_helper as fsh
-from main import ROOT_DIR
-
-mne.set_log_level("WARNING")
-
-EVENTS_ENUM = {
-    "768": "NEW_TRIAL",
-    "769": "LEFT_HAND",
-    "770": "RIGHT_HAND",
-    "783": "CUE_UNKNOWN",
-    "1023": "REJECTED_TRIAL"
-}
-
-LABELS_ENUM = {
-    1: "LEFT_HAND",
-    2: "RIGHT_HAND"
-}
-
-BCI_IV_IIB_DIR = os.path.join(ROOT_DIR, "data/bci-iv-iib")
-GDF_FILES_DIR = os.path.join(BCI_IV_IIB_DIR, "gdf-files")
 
 
-def generate(window_size=1000, classes=None):
-    if classes is None:
-        classes = ["LEFT_HAND", "RIGHT_HAND"]
-
-    dataset_dir = os.path.join(BCI_IV_IIB_DIR, "normalized-by-sample",
+def generate(dataset_root_dir, events_enum, labels_enum, labels, classes, window_size):
+    dataset_dir = os.path.join(dataset_root_dir, "normalized-by-sample",
                                f"window-{window_size}",
                                "-".join(classes).lower())
-
-    label_value = 0
-    labels = {}
-    if "LEFT_HAND" in classes:
-        labels["LEFT_HAND"] = label_value
-        label_value += 1
-    if "RIGHT_HAND" in classes:
-        labels["RIGHT_HAND"] = label_value
-        label_value += 1
 
     fsh.recreate_dir(dataset_dir)
     info = {
         "n_samples_by_file": 0
     }
-    gdf_file_names = filter(lambda f: re.match(".*.gdf", f), sorted(os.listdir(GDF_FILES_DIR)))
+
+    subjects_labels_counts = {}
+    gdf_files_dir = os.path.join(dataset_root_dir, "gdf-files")
+    gdf_file_names = filter(lambda f: re.match(".*.gdf", f), sorted(os.listdir(gdf_files_dir)))
     for gdf_file_name in gdf_file_names:
-        gdf_file = mne.io.read_raw_gdf(os.path.join(GDF_FILES_DIR, gdf_file_name), preload=True)
-        groups_gdf_file = re.match("(.)(\\d+)([ET]).gdf", gdf_file_name).groups()
+        gdf_file = mne.io.read_raw_gdf(os.path.join(gdf_files_dir, gdf_file_name), preload=True)
+        groups_gdf_file = re.match("(.)(\\d{2})(\\d{0,2})([ET])\\.gdf", gdf_file_name).groups()
         database_prefix = groups_gdf_file[0]
         subject = groups_gdf_file[1]
-        session_type = groups_gdf_file[2]
+        session = groups_gdf_file[2]
+        session_type = groups_gdf_file[3]
 
-        labels_filepath = os.path.join(GDF_FILES_DIR, "labels", f"{database_prefix}{subject}{session_type}.mat")
+        labels_filepath = os.path.join(gdf_files_dir, "labels", f"{database_prefix}{subject}{session}{session_type}.mat")
         labels_file = io.loadmat(labels_filepath)["classlabel"]
 
         annotations = gdf_file.annotations
         start_trials_indexes = [event_index for event_index in range(len(annotations.description))
-                                if EVENTS_ENUM.get(annotations.description[event_index]) == "NEW_TRIAL"]
+                                if events_enum.get(annotations.description[event_index]) == "NEW_TRIAL"]
 
         indexes_channels_eeg = [index for index, _ in enumerate(filter(lambda ch: "EEG" in ch, gdf_file.ch_names))]
         n_channels = len(indexes_channels_eeg)
@@ -89,11 +62,11 @@ def generate(window_size=1000, classes=None):
                 end_index += n_samples - event_samples
 
             # The event correspondent to the trial is the following the start trial event
-            if EVENTS_ENUM[annotations.description[cue_event_index]] == "REJECTED_TRIAL":
+            if events_enum[annotations.description[cue_event_index]] == "REJECTED_TRIAL":
                 rejected_trials += 1
                 continue
 
-            label = LABELS_ENUM[labels_file[n_trial][0]]
+            label = labels_enum[labels_file[n_trial][0]]
             if label not in classes:
                 ignored_trials += 1
                 continue
@@ -109,7 +82,7 @@ def generate(window_size=1000, classes=None):
         gdf_file.close()
         X = X.reshape((-1, n_samples, n_channels))
 
-        tfrecord_filepath = os.path.join(dataset_dir, f"A{subject}{session_type}.tfrecord")
+        tfrecord_filepath = os.path.join(dataset_dir, f"{database_prefix}{subject}{session}{session_type}.tfrecord")
         options = tf.io.TFRecordOptions(compression_type="GZIP")
         with tf.io.TFRecordWriter(tfrecord_filepath, options) as writer:
             for n_segment in range(len(y)):
@@ -127,17 +100,24 @@ def generate(window_size=1000, classes=None):
         if valid_trials > info["n_samples_by_file"]:
             info["n_samples_by_file"] = valid_trials
 
+        labels_counts = np.unique(y, return_counts=True)[1]
+        if subject not in subjects_labels_counts:
+            subjects_labels_counts[subject] = labels_counts
+        else:
+            subjects_labels_counts[subject] = subjects_labels_counts[subject] + labels_counts
+
         print("Info from file " + gdf_file_name)
+        print(f"Labels counts: {labels_counts}")
         print("Valid Trials: " + str(valid_trials))
         print("Ignored Trials: " + str(ignored_trials))
         print("Rejected Trials: " + str(rejected_trials))
         print("Total Trials: " + str(valid_trials + ignored_trials + rejected_trials))
+
+    print("Subjects Labels Counts:")
+    print(subjects_labels_counts)
 
     print("Generation dataset ended, saving info data ...")
     print("info[n_samples_by_file]=", info["n_samples_by_file"])
     info_filepath = os.path.join(dataset_dir, "info.pkl")
     with open(info_filepath, "wb") as fp:
         pickle.dump(info, fp, protocol=4)
-
-
-generate()
