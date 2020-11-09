@@ -1,4 +1,7 @@
-from visualization.generate_error_bar_plot import plot
+import os
+
+from main import ROOT_DIR
+from visualization.error_bar_plot_helper import plot_error_bar
 
 x_tick_labels = ["3, 3, 3",
                  "5, 5, 5",
@@ -35,6 +38,7 @@ standard_deviations = [0.03954583526706644,
                        0.03841508929736076,
                        0.03525687402023222]
 
-plot(x_tick_labels, averages, standard_deviations, "results-conv1d-kernel-size-selection.png",
-     x_label="Kernel 1º camada, Kernel 2º camada, Kernel 3º camada",
-     x_ticks_rotation=45, fig_size=(12, 8))
+figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", "results-conv1d-kernel-size-selection.png")
+plot_error_bar(x_tick_labels, averages, standard_deviations, figure_filepath,
+               x_label="Kernel 1º camada, Kernel 2º camada, Kernel 3º camada",
+               x_ticks_rotation=45, fig_size=(12, 8))

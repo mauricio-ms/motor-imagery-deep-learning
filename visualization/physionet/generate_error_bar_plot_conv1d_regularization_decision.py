@@ -1,4 +1,7 @@
-from visualization.generate_error_bar_plot import plot
+import os
+
+from main import ROOT_DIR
+from visualization.error_bar_plot_helper import plot_error_bar
 
 x_tick_labels = ["Base",
                  "Experimento 1",
@@ -14,4 +17,5 @@ standard_deviations = [0.03555372341872865,
                        0.03761847172151291,
                        0.03379597766448776]
 
-plot(x_tick_labels, averages, standard_deviations, "results-conv1d-regularization-decision.png")
+figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", "results-conv1d-regularization-decision.png")
+plot_error_bar(x_tick_labels, averages, standard_deviations, figure_filepath)

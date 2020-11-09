@@ -1,4 +1,7 @@
-from visualization.generate_error_bar_plot import plot
+import os
+
+from main import ROOT_DIR
+from visualization.error_bar_plot_helper import plot_error_bar
 
 x_tick_labels = ["10, 5",
                  "40, 40",
@@ -23,5 +26,6 @@ standard_deviations = [0.017610818473707008,
                        0.030908795271991613,
                        0.030938747643292974]
 
-plot(x_tick_labels, averages, standard_deviations, "results-crnn-window-selection.png",
-     x_label="Tamanho da Janela, Tamanho do deslocamento")
+figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", "results-crnn-window-selection.png")
+plot_error_bar(x_tick_labels, averages, standard_deviations, figure_filepath,
+               x_label="Tamanho da Janela, Tamanho do deslocamento")
