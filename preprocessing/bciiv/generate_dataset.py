@@ -8,6 +8,7 @@ import tensorflow as tf
 from scipy import io
 from tensorflow.core.example.example_pb2 import Example
 from tensorflow.core.example.feature_pb2 import Features, Feature, BytesList, Int64List
+from preprocessing.LabelsCounts import LabelsCounts
 
 import helpers.file_system_helper as fsh
 
@@ -22,7 +23,8 @@ def generate(dataset_root_dir, events_enum, labels_enum, labels, classes, window
         "n_samples_by_file": 0
     }
 
-    subjects_labels_counts = {}
+    subjects_labels_counts = LabelsCounts()
+    subjects_session_labels_counts = LabelsCounts()
     gdf_files_dir = os.path.join(dataset_root_dir, "gdf-files")
     gdf_file_names = filter(lambda f: re.match(".*.gdf", f), sorted(os.listdir(gdf_files_dir)))
     for gdf_file_name in gdf_file_names:
@@ -101,10 +103,8 @@ def generate(dataset_root_dir, events_enum, labels_enum, labels, classes, window
             info["n_samples_by_file"] = valid_trials
 
         labels_counts = np.unique(y, return_counts=True)[1]
-        if subject not in subjects_labels_counts:
-            subjects_labels_counts[subject] = labels_counts
-        else:
-            subjects_labels_counts[subject] = subjects_labels_counts[subject] + labels_counts
+        subjects_labels_counts.put(subject, labels_counts)
+        subjects_session_labels_counts.put(subject + session_type, labels_counts)
 
         print("Info from file " + gdf_file_name)
         print(f"Labels counts: {labels_counts}")
@@ -115,6 +115,8 @@ def generate(dataset_root_dir, events_enum, labels_enum, labels, classes, window
 
     print("Subjects Labels Counts:")
     print(subjects_labels_counts)
+    print("Subjects Session Counts:")
+    print(subjects_session_labels_counts)
 
     print("Generation dataset ended, saving info data ...")
     print("info[n_samples_by_file]=", info["n_samples_by_file"])
