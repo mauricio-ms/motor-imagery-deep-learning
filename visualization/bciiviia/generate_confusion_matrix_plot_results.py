@@ -6,16 +6,18 @@ import numpy as np
 import tensorflow as tf
 from sklearn import metrics
 
-import datasets.bciiviia as dataset
+import datasets.datasets as datasets
+from datasets.bciiviia import get_config
 from main import ROOT_DIR
 from models.bciiviia.cnn1d import load_model
 from visualization.confusion_matrix_plot_helper import plot_confusion_matrix
 
-MODEL_DIR = os.path.join(ROOT_DIR, "models-weights", "bci-iv-iia", "multiple-classes")
+MODEL_DIR = os.path.join(ROOT_DIR, "models-weights", "bci-iv-iia", "all-classes")
 
 print(f"{time.asctime()} - Starting evaluation model ...")
 
-filenames = dataset.get_filenames()
+config = get_config()
+filenames = datasets.get_filenames(config)
 
 n_classes = 4
 cm = np.zeros(shape=(n_classes, n_classes), dtype=np.int64)
@@ -34,7 +36,7 @@ for test_subject in subjects:
     model_weights_filepath = os.path.join(MODEL_DIR, f"{model_name}.h5")
     model = load_model(model_weights_filepath, output_classes=n_classes)
 
-    X, y = dataset.load_data(test_filenames, batch_size=1, expand_dim=False, xy_format=True)
+    X, y = datasets.load(config, test_filenames, batch_size=1, expand_dim=False, xy_format=True)
     y_predicted = model.predict(X)
     cm = cm + metrics.confusion_matrix(y, y_predicted.argmax(axis=1))
 
@@ -44,6 +46,6 @@ print(cm)
 print(f"{time.asctime()} - Evaluation model end!")
 
 classes = ["Mão Esquerda", "Mão Direita", "Pés", "Língua"]
-figure_filepath = os.path.join(ROOT_DIR, "results", "bci-iv-iia", "confusion-matrix-multiple-classes.png")
+figure_filepath = os.path.join(ROOT_DIR, "results", "bci-iv-iia", "confusion-matrix-all-classes.png")
 
 plot_confusion_matrix(cm, classes, figure_filepath)
