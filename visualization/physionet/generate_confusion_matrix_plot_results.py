@@ -12,39 +12,57 @@ from main import ROOT_DIR
 from models.physionet.cnn1d import load_model
 from visualization.confusion_matrix_plot_helper import plot_confusion_matrix
 
-MODEL_DIR = os.path.join(ROOT_DIR, "models-weights", "physionet", "all-classes")
+PHYSIONET_MODELS_DIR = os.path.join(ROOT_DIR, "models-weights", "physionet")
+LABELS_ENUM = {
+    "eyes-closed": "Olhos Fechados",
+    "left-fist": "Punho Esquerdo",
+    "right-fist": "Punho Direito",
+    "both-fists": "Punhos",
+    "both-feet": "Pés"
+}
 
-print(f"{time.asctime()} - Starting evaluation model ...")
 
-config = get_config()
-filenames = datasets.get_filenames(config)
+def plot_confusion_matrix_for_model(classes):
+    config = get_config(classes)
+    model_dirname = config["classes_dirname"]
+    print(f"{time.asctime()} - Starting confusion matrix plot generation for model {model_dirname} ...")
+    model_dir = os.path.join(PHYSIONET_MODELS_DIR, model_dirname)
 
-n_classes = 5
-cm = np.zeros(shape=(n_classes, n_classes), dtype=np.int64)
+    filenames = datasets.get_filenames(config)
 
-n_splits = 10
-kf = KFold(n_splits=n_splits)
-for fold, (train_index, test_index) in enumerate(kf.split(filenames)):
-    print("\nFold: ", fold)
-    test_filenames = filenames[test_index]
+    n_classes = len(classes)
+    cm = np.zeros(shape=(n_classes, n_classes), dtype=np.int64)
 
-    print("Test filenames:")
-    print(test_filenames)
+    n_splits = 10
+    kf = KFold(n_splits=n_splits)
+    for fold, (train_index, test_index) in enumerate(kf.split(filenames)):
+        print("\nFold: ", fold)
+        test_filenames = filenames[test_index]
 
-    model_name = f"independent-{n_splits}-cross-validation-fold-{fold}"
-    model_weights_filepath = os.path.join(MODEL_DIR, f"{model_name}.h5")
+        print("Test filenames:")
+        print(test_filenames)
 
-    model = load_model(model_weights_filepath, output_classes=n_classes)
+        model_filename = f"independent-{n_splits}-cross-validation-fold-{fold}"
+        model_weights_filepath = os.path.join(model_dir, f"{model_filename}.h5")
 
-    X, y = datasets.load(config, test_filenames, batch_size=1, expand_dim=False, xy_format=True)
-    y_predicted = model.predict(X)
-    cm = cm + metrics.confusion_matrix(y, y_predicted.argmax(axis=1))
+        model = load_model(model_weights_filepath, output_classes=n_classes)
 
-    tf.keras.backend.clear_session()
+        X, y = datasets.load(config, test_filenames, batch_size=1, expand_dim=False, xy_format=True)
+        y_predicted = model.predict(X)
+        cm = cm + metrics.confusion_matrix(y, y_predicted.argmax(axis=1))
 
-print(f"{time.asctime()} - Evaluation model end!")
+        tf.keras.backend.clear_session()
 
-classes = ["Olhos Fechados", "Punho Esquerdo", "Punho Direito", "Punhos", "Pés"]
-figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", "confusion-matrix-all-classes.png")
+    print(f"{time.asctime()} - Evaluation model end!")
 
-plot_confusion_matrix(cm, classes, figure_filepath)
+    figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", f"confusion-matrix-{model_dirname}.png")
+
+    classes_labels = [LABELS_ENUM[c] for c in classes]
+    plot_confusion_matrix(cm, classes_labels, figure_filepath)
+
+
+# To generate the confusion matrix to 5-class scenario
+# plot_confusion_matrix_for_model(["eyes-closed", "left-fist", "right-fist", "both-fists", "both-feet"])
+
+# To generate the confusion matrix to 4-class scenario
+plot_confusion_matrix_for_model(["eyes-closed", "left-fist", "right-fist", "both-feet"])

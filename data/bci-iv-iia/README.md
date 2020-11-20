@@ -17,7 +17,7 @@ Each EEG record has one of the following codes:
     
 According with these rules, each EEG record in the gdf files will be mapped to one of the following events in the csv files:
 
-    1: LEFT_HAND
-    2: RIGHT_HAND
-    3: FOOT
-    4: TONGUE
+    0: LEFT_HAND
+    1: RIGHT_HAND
+    2: FOOT
+    3: TONGUE
