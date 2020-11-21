@@ -11,8 +11,9 @@ def plot_error_bar(x_ticks, averages, standard_deviations, figure_filepath,
     ax.set_title(title)
     ax.bar(x, averages, yerr=standard_deviations, align="center", alpha=0.9, capsize=10)
 
-    plt.xlabel(x_label, fontsize=font_size)
-    plt.ylabel(y_label, fontsize=font_size)
+    label_pad = 15
+    plt.xlabel(x_label, labelpad=label_pad, fontsize=font_size, weight="bold")
+    plt.ylabel(y_label, labelpad=label_pad, fontsize=font_size, weight="bold")
     ax.tick_params(axis="y", labelsize=font_size)
 
     if x_ticks_rotation is not None:

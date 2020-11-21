@@ -3,13 +3,13 @@ import os
 from main import ROOT_DIR
 from visualization.error_bar_plot_helper import plot_error_bar
 
-x_tick_labels = ["10, 5",
-                 "40, 40",
-                 "80, 80",
-                 "160, 160",
-                 "320, 0",
-                 "480, 0",
-                 "640, 0"]
+x_tick_labels = ["(62.5, 31.25) ms",
+                 "(0.25, 0.25) s",
+                 "(0.5, 0.5) s",
+                 "(1, 1) s",
+                 "(2, 0) s",
+                 "(3, 0) s",
+                 "(4, 0) s"]
 
 averages = [0.5662032306194306,
             0.596405291557312,
@@ -28,4 +28,4 @@ standard_deviations = [0.017610818473707008,
 
 figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", "results-crnn-window-selection.png")
 plot_error_bar(x_tick_labels, averages, standard_deviations, figure_filepath,
-               x_label="Tamanho da Janela, Tamanho do deslocamento")
+               x_label="(Janela, Deslocamento) Unidade de Tempo", fig_size=(19, 12))
