@@ -62,7 +62,7 @@ def plot_confusion_matrix_for_model(classes):
 
 
 # To generate the confusion matrix to 5-class scenario
-# plot_confusion_matrix_for_model(["eyes-closed", "left-fist", "right-fist", "both-fists", "both-feet"])
+plot_confusion_matrix_for_model(["eyes-closed", "left-fist", "right-fist", "both-fists", "both-feet"])
 
 # To generate the confusion matrix to 4-class scenario
-plot_confusion_matrix_for_model(["eyes-closed", "left-fist", "right-fist", "both-feet"])
+# plot_confusion_matrix_for_model(["eyes-closed", "left-fist", "right-fist", "both-feet"])

@@ -11,21 +11,22 @@ x_tick_labels = ["(62.5, 31.25) ms",
                  "(3, 0) s",
                  "(4, 0) s"]
 
-averages = [0.5662032306194306,
-            0.596405291557312,
-            0.6108131289482117,
-            0.6309646427631378,
-            0.6347777664661407,
-            0.6539797961711884,
-            0.6635959625244141]
-standard_deviations = [0.017610818473707008,
-                       0.021647917581321955,
-                       0.026114269769024732,
-                       0.030232735557993627,
-                       0.024183306005983927,
-                       0.030908795271991613,
-                       0.030938747643292974]
+averages = [0.5399867296218872,
+            0.5618333339691162,
+            0.583931815624237,
+            0.6067323327064514,
+            0.5949696958065033,
+            0.5860606074333191,
+            0.609090906381607]
+standard_deviations = [0.012469947780813551,
+                       0.019838599458321317,
+                       0.020426887088374802,
+                       0.03249515129893599,
+                       0.027812140088209165,
+                       0.035179484337870895,
+                       0.04437818789499396]
 
 figure_filepath = os.path.join(ROOT_DIR, "results", "physionet", "results-crnn-window-selection.png")
 plot_error_bar(x_tick_labels, averages, standard_deviations, figure_filepath,
-               x_label="(Janela, Deslocamento) Unidade de Tempo", fig_size=(19, 12))
+               x_label="(Janela, Deslocamento) Unidade de Tempo",
+               fig_size=(19, 12), index_best_result=3)

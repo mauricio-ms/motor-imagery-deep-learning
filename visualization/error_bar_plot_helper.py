@@ -4,7 +4,7 @@ import numpy as np
 
 def plot_error_bar(x_ticks, averages, standard_deviations, figure_filepath,
                    x_label="", y_label="Acurácia", title="", x_ticks_rotation=None,
-                   fig_size=(10, 7), font_size=18, bold_max_value=True):
+                   fig_size=(10, 7), font_size=18, bold_max_value=True, index_best_result=None):
     x = np.arange(len(x_ticks))
 
     fig, ax = plt.subplots(figsize=fig_size)
@@ -21,7 +21,7 @@ def plot_error_bar(x_ticks, averages, standard_deviations, figure_filepath,
     ax.set_xticks(x)
     ax.set_xticklabels(x_ticks, fontsize=font_size)
 
-    index_best_result = np.argmax(averages)
+    index_best_result = np.argmax(averages) if index_best_result is None else index_best_result
     if bold_max_value:
         tick_max_value = ax.xaxis.get_major_ticks()[index_best_result]
         tick_max_value.label1.set_fontweight("bold")
